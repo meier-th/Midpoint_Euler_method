@@ -4,10 +4,11 @@
 #include <vector>
 #include <iostream>
 #include <math.h>
+#include "Point.h"
 
-std::vector<double> count_function(std::vector<double>, std::vector<double>);
-std::vector<double> polynomial_multiplication(const std::vector<double>&, const std::vector<double>&);
-std::vector<double> polynomial_sum(const std::vector<double>&, const std::vector<double>&);
-double interpolation_function(double arg, const std::vector<double>&);
+std::vector<long double> count_function(std::vector<Point>);
+std::vector<long double> polynomial_multiplication(const std::vector<long double>&, const std::vector<long double>&);
+std::vector<long double> polynomial_sum(const std::vector<long double>&, const std::vector<long double>&);
+double interpolation_function(double arg, const std::vector<long double>&);
 
 #endif

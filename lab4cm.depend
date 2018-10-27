@@ -1,18 +1,38 @@
 # depslib dependency file v1.0
-1540499859 source:/home/steinmann_th/Desktop/C++/About_Students/lab4cm/main.cpp
+1540656206 source:/home/steinmann_th/Desktop/C++/About_Students/lab4cm/main.cpp
 	<SFML/Graphics.hpp>
 	<SFML/Window.hpp>
 	<SFML/System.hpp>
 	"interpolation_functions.hpp"
+	"differential_equation_functions.hpp"
 	<iostream>
 	<sstream>
+	<string>
 	<math.h>
+	"Point.h"
 
-1540499874 source:/home/steinmann_th/Desktop/C++/About_Students/lab4cm/interpolation_functions.cpp
+1540653817 source:/home/steinmann_th/Desktop/C++/About_Students/lab4cm/interpolation_functions.cpp
 	"interpolation_functions.hpp"
 
-1540499846 /home/steinmann_th/Desktop/C++/About_Students/lab4cm/interpolation_functions.hpp
+1540653835 /home/steinmann_th/Desktop/C++/About_Students/lab4cm/interpolation_functions.hpp
 	<vector>
 	<iostream>
 	<math.h>
+	"Point.h"
+
+1540653006 source:/home/steinmann_th/Desktop/C++/About_Students/lab4cm/differential_equation_functions.cpp
+	"differential_equation_functions.hpp"
+	<math.h>
+	"interpolation_functions.hpp"
+	<iostream>
+	"Point.h"
+
+1540501026 /home/steinmann_th/Desktop/C++/About_Students/lab4cm/differential_equation_functions.hpp
+	<vector>
+	"Point.h"
+
+1540544615 /home/steinmann_th/Desktop/C++/About_Students/lab4cm/include/Point.h
+
+1540544789 source:/home/steinmann_th/Desktop/C++/About_Students/lab4cm/src/Point.cpp
+	"Point.h"
 

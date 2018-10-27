@@ -1,6 +1,6 @@
 #include "Point.h"
 
-Point::Point(double x, double y)
+Point::Point(double& x, double& y)
 {
     this->Setx(x);
     this->Sety(y);
@@ -10,8 +10,8 @@ Point::~Point(){}
 
 Point::Point(const Point& other)
 {
-    this->Setx(other.Getx());
-    this->Sety(other.Gety());
+    x = other.x;
+    y = other.y;
 }
 
 Point& Point::operator=(const Point& rhs)

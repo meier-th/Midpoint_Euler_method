@@ -5,7 +5,7 @@
 class Point
 {
     public:
-        Point();
+        Point(double& x, double& y);
         virtual ~Point();
         Point(const Point& other);
         Point& operator=(const Point& other);

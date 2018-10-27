@@ -2,8 +2,10 @@
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include "interpolation_functions.hpp"
+#include "differential_equation_functions.hpp"
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <math.h>
 #include "Point.h"
 
@@ -12,24 +14,35 @@ using namespace std;
 sf::RenderTexture renderTexture;
 sf::RenderWindow app(sf::VideoMode(850, 480), "Lab4");
 sf::Font font;
+std::string int2Str(long double x);
+vector<long double>points_for_plot;
+double c;
 
 void drawLines(double, double);
-void plot();
-double test_function(double x, double y) {
-    return x*x - 2*y;
+void plot1();
+double test_function1(double x, double y) {
+    return x*x - 2*y /*x*pow(M_E, -x*x) - 2*x*y*//*pow(M_E, x)+y*/;
+}
+
+double answer_function(double x) {
+    return 0.5*x*x-0.5*x+0.25+c/pow(M_E, 2*x)/*c*pow(M_E, -x*x)+x*x/(2*pow(M_E, x*x))*//*c*pow(M_E, x)+x*pow(M_E, x)*/;
 }
 
 int main()
 {
-
-
-            if (!font.loadFromFile("arial.ttf"))
-            return EXIT_FAILURE;
-
-    drawLines(1, 1);
-    plot();
+    if (!font.loadFromFile("arial.ttf"))
+        return EXIT_FAILURE;
+    plot1();
     sf::String playerInput = "";
     sf::Text playerText;
+    sf::Text reply;
+    sf::Text realAnswer;
+    realAnswer.setPosition(620, 100);
+    realAnswer.setFont(font);
+    realAnswer.setColor(sf::Color::Green);
+    reply.setPosition(620, 70);
+    reply.setFont(font);
+    reply.setColor(sf::Color::Red);
     playerText.setPosition(620, 40);
     playerText.setFont(font);
     playerText.setColor(sf::Color::Red);
@@ -43,42 +56,122 @@ int main()
             if (event.type == sf::Event::Closed)
                 app.close();
             else if (event.type == sf::Event::TextEntered) {
-                playerInput +=event.text.unicode;
-
+                char ch = event.text.unicode;
+                char last = *(playerInput.end()-1);
+                //cout<<last<<endl;
+                if (ch == '-' || isdigit(ch) || ch == '.' && last != '.')
+                    playerInput +=ch;
+                if (ch == 8) {
+                    string s = playerInput;
+                    playerInput = s.substr(0, s.size()-1);
+                }
                 playerText.setString(playerInput);
-
+                string s = playerInput;
+                if (s != ""  && s != "-") {
+                    try {
+                        double arg = std::stod(s);
+                        sf::String ans = int2Str(interpolation_function(arg, points_for_plot));
+                        sf::String trAns = int2Str(answer_function(arg));
+                        realAnswer.setString(trAns);
+                        reply.setString(ans);
+                    } catch (const std::invalid_argument&) {
+                        reply.setString("NaN");
+                        realAnswer.setString("NaN");
+                    } catch (const std::out_of_range&) {
+                        reply.setString("Out of bounds");
+                    }
+                }
             }
         }
+
         app.clear(sf::Color::White);
         app.draw(sprite);
         app.draw(playerText);
+        app.draw(reply);
+        app.draw(realAnswer);
         app.display();
 
     }
     return EXIT_SUCCESS;
 }
 
-void plot() {
-    double startX = 0;
-    double startY = 200;
-    for (double x = -15; x < 15; x = x + 0.001) {
-        double y = sin(x);
+void plot1() {
+    cout<<"Enter X0: ";
+    double x0;
+    cin>>x0;
+    cout<<endl<<"Enter Y0: ";
+    double y0;
+    cin>>y0;
+    c = pow(M_E, 2*x0)*(y0-0.5*x0*x0+0.5*x0-0.25)/*y0*pow(M_E, x0*x0)-x0*x0/(2*pow(M_E, x0*x0))*//*y0/pow(M_E, x0)-x0*pow(M_E, x0)*/;
+    cout<<endl<<"Enter max x: ";
+    double max_x;
+    cin>>max_x;
+    cout<<endl<<"Enter precision: ";
+    double prec;
+    cin>>prec;
+    double x_sc = max(std::abs(max_x), std::abs(x0))/10;
+
+
+
+    double auxX = 20/x_sc;
+
+    vector<Point> vect = solve_equation(test_function1, x0, y0, max_x, prec);
+    double y_max = std::abs(y0);
+    for (size_t i = 0; i < vect.size(); ++i) {
+        //cout<<std::abs(vect[i].Gety())<<endl;
+        if (std::abs(vect[i].Gety()) > y_max)
+            y_max = std::abs(vect[i].Gety());
+    }
+    double y_sc = y_max/8;
+    double auxY = 20/y_sc;
+    double startX = 300 + x0*20/x_sc;
+    double startY = 200 - y0*20/y_sc;
+    drawLines(x_sc, y_sc);
+    vector<Point>pt;
+    if (vect.size() > 20) {
+        int num = round(vect.size()/20);
+        for (int i = 0; i < vect.size(); ++i) {
+            if (i % num == 0 || i == vect.size()-1)
+                pt.push_back(vect[i]);
+        }
+    }
+    else {
+        pt = vect;
+    }
+    double yR = y0;
+    double startYR = 200 - y0*20/y_sc;
+    points_for_plot = count_function(pt);
+    for (double x = x0; x < max_x; x = x + 0.001) {
+        double y = interpolation_function(x, points_for_plot);
+        yR = answer_function(x);
         sf::VertexArray lines(sf::LinesStrip, 2);
+        sf::VertexArray reallines(sf::LinesStrip, 2);
+        sf::VertexArray* pntr = &reallines;
+        sf::Vertex* p1 = &((*pntr)[0]);
+        p1->color = sf::Color::Green;
+        p1 = &(*pntr)[1];
+        p1->color = sf::Color::Green;
+        reallines[0].position = sf::Vector2f(startX, startYR);
+        reallines[1].position = sf::Vector2f(300 + x*auxX, 200 - yR*auxY);
+        renderTexture.draw(reallines);
         lines[0].position = sf::Vector2f(startX, startY);
-        lines[1].position = sf::Vector2f(x*20, 200 - y*20);
+        lines[1].position = sf::Vector2f(300 + x*auxX, 200 - y*auxY);
         renderTexture.draw(lines);
-        startX = x*20;
-        startY = 200-y*20;
+        startX = 300 + x*auxX;
+        startY = 200-y*auxY;
+        startYR = 200-yR*auxY;
     }
     renderTexture.display();
 }
 
-std::string int2Str(double x)
+std::string int2Str(long double x)
 	{
 		std::stringstream type;
 		type << x;
 		return type.str();
 	}
+
+
 
 void drawLines(double scaleX, double scaleY) {
     renderTexture.create(600, 400, true);

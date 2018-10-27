@@ -2,23 +2,32 @@
 
 using namespace std;
 
-vector<double> count_function(vector<double> xs, vector<double> ys) {
-    typedef vector<double>::size_type size;
-    size sz = xs.size();
-    vector<double>final_polynom = {0};
+vector<long double> count_function(vector<Point> points) {
+    typedef vector<Point>::size_type size;
+    size sz = points.size();
+    vector<double>xs;
+    vector<double>ys;
+    for (size i = 0; i < sz; i++) {
+        double x = points[i].Getx();
+        double y = points[i].Gety();
+        xs.push_back(x);
+        ys.push_back(y);
+        cout<<"X: "<<x<<"; Y: "<<y<<endl;
+    }
+    vector<long double>final_polynom = {0};
     for (int i = 0; i < sz; ++i) {
-        double denominator = 1;
-        vector<double> nominator = {1};
+        long double denominator = 1;
+        vector<long double> nominator = {1};
         for (int j = 0; j < sz; ++j) {
             if (i != j) {
                 denominator *= (xs[i] - xs[j]);
-                vector<double>current_polynom = {(-1)*xs[j], 1};
+                vector<long double>current_polynom = {(-1)*xs[j], 1};
                 nominator = polynomial_multiplication(nominator, current_polynom);
             }
         }
-        vector<double>denom = {1/denominator};
+        vector<long double>denom = {1/denominator};
         nominator = polynomial_multiplication(nominator, denom);
-        vector<double>y_value = {ys[i]};
+        vector<long double>y_value = {ys[i]};
         nominator = polynomial_multiplication(nominator, y_value);
         final_polynom = polynomial_sum(final_polynom, nominator);
     }
@@ -28,16 +37,16 @@ vector<double> count_function(vector<double> xs, vector<double> ys) {
 /*
     Two vectors represent two polynomials, indexes are x powers, values are coefficients
 */
-vector<double> polynomial_multiplication(const vector<double>& first, const vector<double>& second) {
-    typedef vector<double>::size_type size;
+vector<long double> polynomial_multiplication(const vector<long double>& first, const vector<long double>& second) {
+    typedef vector<long double>::size_type size;
     size sz = first.size() + second.size() - 1;
-    vector<double>results;
+    vector<long double>results;
     for (int i = 0; i < sz; ++i) {
         results.push_back(0);
     }
     for (int i = 0; i < first.size(); ++i) {
         for (int j = 0; j < second.size(); ++j) {
-            double value = first[i]*second[j];
+            long double value = first[i]*second[j];
             int index = i+j;
             results[index] += value;
         }
@@ -45,12 +54,12 @@ vector<double> polynomial_multiplication(const vector<double>& first, const vect
     return results;
 }
 
-vector<double> polynomial_sum(const vector<double>& first, const vector<double>& second) {
-    typedef vector<double>::size_type size;
+vector<long double> polynomial_sum(const vector<long double>& first, const vector<long double>& second) {
+    typedef vector<long double>::size_type size;
     size sz = max(first.size(), second.size());
-    vector<double>results;
+    vector<long double>results;
     for (int i = 0; i < sz; ++i) {
-        double val = 0;
+        long double val = 0;
         if (i < first.size())
             val += first[i];
         if (i < second.size())
@@ -60,9 +69,9 @@ vector<double> polynomial_sum(const vector<double>& first, const vector<double>&
     return results;
 }
 
-double interpolation_function(double arg, const vector<double>& coefficients) {
+double interpolation_function(double arg, const vector<long double>& coefficients) {
     size_t sz = coefficients.size();
-    double result = 0;
+    long double result = 0;
     for (size_t i = 0; i < sz; i++) {
         result += coefficients[i] * pow(arg, i);
     }
